@@ -41,6 +41,8 @@ def linc_address():
 
     locationid={'barnaul': 621630,'alt-kray':621590}
     loc=locationid['barnaul']
+
+    #
     url = 'https://www.avito.ru/web/1/main/items?forceLocation=true&locationId=621590&lastStamp=1675071341&limit=30&offset=28&categoryId=1'#alt-kray
     url2 = f'https://www.avito.ru/web/1/main/items?forceLocation=true&locationId={loc}&lastStamp=1675071341&limit=30&offset=28&categoryId=1'#alt-kray
     print(url)

@@ -6,11 +6,59 @@ from selenium import webdriver
 from selenium.webdriver import ActionChains
 from selenium.webdriver.chrome.service import Service
 
-cur_time = datetime.now().strftime('%d_%m_%Y_%H_%M')
 
+import os
+import pywebio
+from pywebio.output import*
+import pywebio.input as inp
+
+
+location_reg=''
+category=''
+limit_req=0
+
+cur_time = datetime.now().strftime('%d_%m_%Y_%H_%M')
+@pywebio.config(theme='dark')
+async def interfes():
+    clear()
+    logo_path = os.path.join('data', 'logo.jpg')
+    put_image(open(logo_path, 'rb').read())
+    location_reg = await inp.select(
+        'Выберите нужный вариант',
+        [
+            'Вбарете регион',
+            'Barnaul',
+            'alt-kray'
+
+        ]
+    )
+    
+    category = await inp.select(
+        'Выберите нужный вариант',
+        [
+            'Вбарете Категорию',
+            'avto',
+            'nedvizimost'
+
+        ]
+    )
+
+    limit_req = await inp.select(
+            'Выберите нужный вариант',
+            [
+                'Сколко последних обьявлений вы хотите получить',
+                '30',
+                '40',
+                '50',
+                '60'
+
+
+            ]
+        )
+    linc_address(location_reg, category, limit_req)
+    put_text('Ваш файл сформирован')
 
 def get_source_html(url):
-
     options = webdriver.ChromeOptions()
     options.add_argument(
         argument='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.53 Safari/537.36')
@@ -37,16 +85,18 @@ def get_source_html(url):
         driver.close()
         driver.quit()
 
-def linc_address():
-
-    locationid={'barnaul': 621630,'alt-kray':621590}
-    loc=locationid['barnaul']
+def linc_address(location_reg, category, limit_req):
+    locationid={'Barnaul': 621630,'alt-kray':621590}
+    categoryid={'avto': 1,'nedvizimost':4}
+    # limit_req = int(limit_req)
+    # print(limit_req)
+    loc=locationid[location_reg]
+    cat=categoryid[category]
 
     #
-    url = 'https://www.avito.ru/web/1/main/items?forceLocation=true&locationId=621590&lastStamp=1675071341&limit=30&offset=28&categoryId=1'#alt-kray
-    url2 = f'https://www.avito.ru/web/1/main/items?forceLocation=true&locationId={loc}&lastStamp=1675071341&limit=30&offset=28&categoryId=1'#alt-kray
-    print(url)
-    print(url2)
+    # url = 'https://www.avito.ru/web/1/main/items?forceLocation=true&locationId=621590&lastStamp=1675071341&limit=30&offset=28&categoryId=1'#alt-kray
+    url2 = f'https://www.avito.ru/web/1/main/items?forceLocation=true&locationId={loc}&lastStamp=1675071341&limit={limit_req}&offset={limit_req}&categoryId={cat}'#alt-kray
+    get_source_html(url2)
     
 
 def get_result(json_data):
@@ -94,4 +144,7 @@ if __name__ == '__main__':
     # url = 'https://www.avito.ru/web/1/main/items?forceLocation=true&locationId=621590&lastStamp=1675071341&limit=30&offset=28&categoryId=1'#alt-kray
 
     # get_source_html(url)
-    linc_address()
+    # interfes()
+    pywebio.start_server(interfes, port='8000', debug=True)
+    # get_source_html(url)
+   
